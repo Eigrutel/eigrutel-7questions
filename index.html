@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>7 questions</title>
+  <meta name="description" content="7 questions est une application web bilingue fondée sur les méthodes QQOQCCP et 5W2H.">
+  <link rel="icon" type="image/png" href="favicon/fav10.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/fav10.png">
+  <style>
+    :root{
+      --page-bg:#F3F4F6;
+      --panel-bg:#FAFAF7;
+      --blue:#1F3A44;
+      --red:#A63D40;
+      --ochre:#C47A2C;
+      --text:#2D2436;
+      --muted:#6F6675;
+      --border:rgba(31,58,68,.12);
+      --shadow:0 18px 45px rgba(31,58,68,.12);
+      --shadow-light:0 8px 22px rgba(31,58,68,.08);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:
+        radial-gradient(circle at top left,rgba(196,122,44,.08),transparent 30rem),
+        var(--page-bg);
+      color:var(--text);
+    }
+
+    .site-shell{
+      width:min(1120px,calc(100% - 32px));
+      margin:0 auto;
+      padding:28px 0 36px;
+    }
+
+    .hero{
+      overflow:hidden;
+      background:var(--panel-bg);
+      border:1px solid var(--border);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero-copy{
+      padding:clamp(28px,5vw,64px);
+      text-align:center;
+    }
+
+    .eyebrow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      margin:0 0 18px;
+      color:var(--red);
+      font-size:.74rem;
+      font-weight:850;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after{
+      content:"";
+      display:block;
+      width:46px;
+      height:1px;
+      background:rgba(31,58,68,.28);
+    }
+
+    h1{
+      margin:0;
+      color:var(--blue);
+      font-size:clamp(2.6rem,8vw,5.8rem);
+      line-height:.95;
+      letter-spacing:-.055em;
+    }
+
+    .version{
+      display:inline-block;
+      margin-top:18px;
+      padding:6px 10px;
+      border:1px solid rgba(31,58,68,.15);
+      border-radius:999px;
+      background:#fff;
+      color:var(--muted);
+      font-size:.78rem;
+      font-weight:750;
+    }
+
+    .intro-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:18px;
+      max-width:860px;
+      margin:32px auto 0;
+      text-align:left;
+    }
+
+    .intro{
+      padding:20px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:var(--shadow-light);
+    }
+
+    .intro h2{
+      margin:0 0 9px;
+      color:var(--blue);
+      font-size:1rem;
+    }
+
+    .intro p{
+      margin:0;
+      color:var(--muted);
+      font-size:.98rem;
+      line-height:1.65;
+    }
+
+    .actions{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:30px;
+    }
+
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:13px 20px;
+      border:1px solid transparent;
+      border-radius:13px;
+      font-size:.94rem;
+      font-weight:850;
+      text-decoration:none;
+      transition:transform .15s ease,filter .15s ease,border-color .15s ease;
+    }
+
+    .button:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.05);
+    }
+
+    .button-primary{
+      background:var(--blue);
+      color:#fff;
+      box-shadow:var(--shadow-light);
+    }
+
+    .button-secondary{
+      border-color:rgba(31,58,68,.18);
+      background:#fff;
+      color:var(--blue);
+    }
+
+    .preview{
+      margin:0;
+      padding:0 clamp(16px,4vw,46px) clamp(20px,4vw,46px);
+    }
+
+    .preview-frame{
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius:20px;
+      background:#fff;
+      box-shadow:var(--shadow-light);
+    }
+
+    .preview img{
+      display:block;
+      width:100%;
+      height:auto;
+    }
+
+    .preview figcaption{
+      padding:12px 16px 15px;
+      color:var(--muted);
+      font-size:.82rem;
+      text-align:center;
+    }
+
+    .links{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      margin-top:22px;
+    }
+
+    .link-card{
+      display:block;
+      padding:20px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:#fff;
+      color:var(--blue);
+      text-decoration:none;
+      box-shadow:var(--shadow-light);
+      transition:transform .15s ease,border-color .15s ease;
+    }
+
+    .link-card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(196,122,44,.45);
+    }
+
+    .link-card strong{
+      display:block;
+      margin-bottom:7px;
+      font-size:1rem;
+    }
+
+    .link-card span{
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.5;
+    }
+
+    footer{
+      padding:30px 18px 6px;
+      text-align:center;
+      color:var(--muted);
+      font-size:.82rem;
+      line-height:1.7;
+    }
+
+    footer strong{color:var(--blue)}
+
+    footer a{
+      color:var(--blue);
+      font-weight:750;
+      text-decoration:none;
+    }
+
+    footer a:hover{text-decoration:underline}
+
+    @media (max-width:720px){
+      .site-shell{
+        width:min(100% - 20px,1120px);
+        padding-top:10px;
+      }
+
+      .hero{border-radius:20px}
+
+      .intro-grid,
+      .links{grid-template-columns:1fr}
+
+      .actions{display:grid}
+
+      .button{width:100%}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="site-shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Eigrutel Lab</p>
+        <h1 id="page-title">7 questions</h1>
+        <span class="version">Version 1.0.0</span>
+
+        <div class="intro-grid">
+          <section class="intro" lang="fr">
+            <h2>Français</h2>
+            <p>
+              Une application web bilingue fondée sur la méthode QQOQCCP
+              pour examiner un sujet, une situation, une scène, un problème
+              ou une décision à travers sept questions essentielles.
+            </p>
+          </section>
+
+          <section class="intro" lang="en">
+            <h2>English</h2>
+            <p>
+              A bilingual web application based on the 5W2H method,
+              designed to examine a subject, situation, scene, problem,
+              or decision through seven essential questions.
+            </p>
+          </section>
+        </div>
+
+        <div class="actions">
+          <a class="button button-primary" href="7questions.html">
+            Ouvrir 7 questions
+          </a>
+
+          <a class="button button-secondary" href="https://github.com/Eigrutel/7questions/releases/latest">
+            Télécharger la version stable
+          </a>
+        </div>
+      </div>
+
+      <figure class="preview">
+        <div class="preview-frame">
+          <img src="docs/images/7questions-FR.png" alt="Capture d’écran de l’interface française de 7 questions">
+        </div>
+        <figcaption>
+          Interface française de 7 questions — French interface preview
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="links" aria-label="Documentation et code source">
+      <a class="link-card" href="README.md">
+        <strong>Documentation</strong>
+        <span>Présentation, utilisation, sauvegarde, exports et informations techniques.</span>
+      </a>
+
+      <a class="link-card" href="https://github.com/Eigrutel/7questions">
+        <strong>Code source</strong>
+        <span>Consulter le dépôt, le journal des versions, l’architecture et les licences.</span>
+      </a>
+    </section>
+
+    <footer>
+      <p>
+        <strong>Eigrutel Lab — Atelier d’outils libres pour la bande dessinée</strong><br>
+        Programme conçu et développé par Simon Léturgie dans le cadre d’Eigrutel BD Academy.
+      </p>
+
+      <p>
+        Code sous licence <a href="LICENSE.md">GNU AGPL v3.0 ou ultérieure</a>.
+        Documentation et modèles sous licence <a href="LICENSE.md">CC BY-SA 4.0</a>, sauf mention contraire.
+        Marques, logos et signes distinctifs Eigrutel, Eigrutel Lab et Eigrutel BD Academy réservés.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
