@@ -1,0 +1,1710 @@
+<!-- Eigrutel Lab - Atelier d'outils libres pour la bande dessinée Programme conçu et développé par Simon Léturgie dans le cadre d'Eigrutel BD Academy. Nom : 7 questions Version : 1.0.0 Date : 29-07-2026
+JJ Code : GNU AGPL v3.0 ou version ultérieure. Documentation et modèles : CC BY-SA 4.0,
+sauf mention contraire. Marques, logos et signes distinctifs Eigrutel / Eigrutel Lab / Eigrutel BD Academy : réservés. -->
+<!DOCTYPE html>
+<!--
+  7 Questions — application bilingue QQOQCCP / 5W2H
+  ---------------------------------------------------
+  FR : Fichier HTML autonome, conçu pour être relu, modifié et partagé.
+       Les commentaires décrivent les grandes sections et chaque fonction JavaScript.
+  EN : Standalone HTML file designed to be read, modified and shared.
+       Comments describe the main sections and every JavaScript function.
+-->
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7 questions</title>
+
+<link rel="icon" type="image/png" href="favicon/fav10.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/fav10.png">
+<meta name="apple-mobile-web-app-title" content="7 questions">
+
+<style>
+:root{
+  --page-bg:#F3F4F6;
+  --card-bg:#FFFFFF;
+  --panel-bg:#FAFAF7;
+  --paper:#F4F1EA;
+
+  --bleu-atelier:#1F3A44;
+  --rouge-atelier:#A63D40;
+  --ocre:#C47A2C;
+  --gris-encrage:#3C3C3C;
+
+  --text-main:#2D2436;
+  --text-muted:#75667E;
+  --border:rgba(31,58,68,.11);
+
+  --filled-bg:#F7F3EA;
+  --filled-border:rgba(31,58,68,.26);
+  --active-bg:#FFFDF8;
+
+  --shadow-soft:0 10px 24px rgba(26,26,26,.08);
+  --shadow-light:0 4px 12px rgba(26,26,26,.06);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--page-bg);
+  color:var(--text-main);
+}
+
+.qq-app{
+  max-width:1120px;
+  margin:0 auto;
+  padding:22px clamp(14px,3vw,32px) 34px;
+}
+
+.qq-panel{
+  background:var(--panel-bg);
+  border:1px solid rgba(31,58,68,.07);
+  border-radius:24px;
+  padding:clamp(16px,2.4vw,26px);
+  box-shadow:var(--shadow-soft);
+}
+
+/* =========================================================
+   EN-TÊTE ET TITRES / HEADER AND TITLES
+   ========================================================= */
+
+.qq-hero{
+  text-align:center;
+  padding:14px 8px 26px;
+}
+
+.qq-kicker{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  margin:0 0 14px;
+  color:var(--rouge-atelier);
+  font-size:.72rem;
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+.qq-kicker::before,
+.qq-kicker::after{
+  content:"";
+  display:block;
+  width:48px;
+  height:1px;
+  background:rgba(31,58,68,.28);
+}
+
+.qq-title{
+  margin:0;
+  color:var(--bleu-atelier);
+  font-size:24px;
+  line-height:1.1;
+  letter-spacing:-.02em;
+  font-weight:850;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+
+.qq-progress{
+  width:min(360px,52%);
+  height:4px;
+  margin:0 auto 18px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(31,58,68,.09);
+}
+
+.qq-progress span{
+  display:block;
+  width:0%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--rouge-atelier),var(--ocre));
+  transition:width .22s ease;
+}
+
+/* =========================================================
+   FORMULAIRE / FORM
+   ========================================================= */
+
+.qq-form{
+  display:grid;
+  gap:14px;
+}
+
+.qq-subject-card{
+  position:relative;
+  background:linear-gradient(135deg,#1F3A44 0%,#263F49 100%);
+  border:1px solid rgba(31,58,68,.34);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 12px 26px rgba(31,58,68,.16);
+  transition:border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.qq-subject-card:focus-within{
+  border-color:rgba(196,122,44,.75);
+  box-shadow:0 0 0 3px rgba(196,122,44,.18), 0 12px 26px rgba(31,58,68,.16);
+}
+
+.qq-subject-card.is-filled{
+  background:linear-gradient(135deg,#17323C 0%,#1F3A44 100%);
+}
+
+.qq-subject-card .qq-label-row{
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.qq-subject-card .qq-label{
+  color:#FAFAF7;
+  font-size:.78rem;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+
+.qq-subject-card .qq-info{
+  border-color:rgba(250,250,247,.36);
+  background:rgba(250,250,247,.12);
+  color:#FAFAF7;
+}
+
+.qq-subject-card .qq-info:hover,
+.qq-subject-card .qq-info:focus{
+  background:rgba(250,250,247,.20);
+  border-color:rgba(250,250,247,.58);
+}
+
+.qq-subject-card textarea{
+  min-height:54px;
+  max-height:110px;
+  resize:vertical;
+  overflow:auto;
+  border-color:rgba(250,250,247,.28);
+  background:rgba(255,255,255,.96);
+  color:var(--text-main);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45);
+  font-size:1rem;
+  font-weight:650;
+  line-height:1.35;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+.qq-subject-card textarea::placeholder{
+  white-space:normal;
+  overflow-wrap:break-word;
+  color:rgba(45,36,54,.48);
+}
+
+.qq-subject-card textarea:focus{
+  background:#fff;
+  border-color:rgba(196,122,44,.85);
+  box-shadow:0 0 0 3px rgba(196,122,44,.20);
+}
+
+.qq-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  align-items:start;
+}
+
+.qq-card{
+  position:relative;
+  min-height:190px;
+  display:flex;
+  flex-direction:column;
+  padding:14px;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-left:5px solid transparent;
+  border-radius:14px;
+  box-shadow:var(--shadow-light);
+  transition:background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.qq-card:focus-within{
+  background:var(--active-bg);
+  border-color:rgba(196,122,44,.48);
+  border-left-color:var(--ocre);
+  box-shadow:0 0 0 3px rgba(196,122,44,.10), var(--shadow-light);
+}
+
+.qq-card.is-filled{
+  background:var(--filled-bg);
+  border-color:var(--filled-border);
+  border-left-color:var(--bleu-atelier);
+}
+
+.qq-card.is-filled:focus-within{
+  background:#FFFDF8;
+  border-left-color:var(--ocre);
+}
+
+.qq-card.notes{
+  grid-column:1 / -1;
+  min-height:230px;
+}
+
+.qq-label-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.qq-label{
+  margin:0;
+  color:var(--bleu-atelier);
+  font-size:1.05rem;
+  line-height:1.15;
+  font-weight:850;
+}
+
+
+.qq-card-tools{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.qq-collapse{
+  position:relative;
+  flex:0 0 auto;
+  width:22px;
+  height:22px;
+  display:inline-grid;
+  place-items:center;
+  border:1px solid rgba(31,58,68,.14);
+  border-radius:999px;
+  background:rgba(31,58,68,.045);
+  color:var(--bleu-atelier);
+  line-height:1;
+  cursor:pointer;
+  box-shadow:none;
+  padding:0;
+}
+
+.qq-collapse svg{
+  width:13px;
+  height:13px;
+  display:block;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2.4;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition:transform .14s ease;
+}
+
+.qq-collapse:hover,
+.qq-collapse:focus{
+  outline:none;
+  background:rgba(31,58,68,.09);
+  border-color:rgba(31,58,68,.26);
+  transform:none;
+  filter:none;
+}
+
+.qq-card.is-collapsed{
+  min-height:0;
+  background:#FBFAF7;
+}
+
+.qq-card.is-collapsed textarea{
+  display:none;
+}
+
+.qq-card.is-collapsed .qq-collapse svg{
+  transform:rotate(-90deg);
+}
+
+
+.qq-lock{
+  position:relative;
+  flex:0 0 auto;
+  width:22px;
+  height:22px;
+  display:inline-grid;
+  place-items:center;
+  border:1px solid rgba(31,58,68,.14);
+  border-radius:999px;
+  background:rgba(31,58,68,.045);
+  color:var(--bleu-atelier);
+  line-height:1;
+  cursor:pointer;
+  box-shadow:none;
+  padding:0;
+}
+
+.qq-lock svg{
+  width:13px;
+  height:13px;
+  display:block;
+  fill:currentColor;
+  stroke:none;
+}
+
+.qq-lock:hover,
+.qq-lock:focus{
+  outline:none;
+  background:rgba(31,58,68,.09);
+  border-color:rgba(31,58,68,.26);
+  transform:none;
+  filter:none;
+}
+
+.qq-lock.is-locked{
+  background:rgba(166,61,64,.10);
+  border-color:rgba(166,61,64,.28);
+  color:var(--rouge-atelier);
+  box-shadow:none;
+}
+
+.qq-lock.is-locked:hover,
+.qq-lock.is-locked:focus{
+  background:rgba(166,61,64,.15);
+  border-color:rgba(166,61,64,.38);
+  color:var(--rouge-atelier);
+}
+
+.qq-card.is-locked{
+  background:#F8F6F1;
+  border-left-color:rgba(31,58,68,.25);
+}
+
+.qq-card.is-locked textarea{
+  background:#F4F1EA;
+  color:rgba(45,36,54,.72);
+  cursor:not-allowed;
+}
+
+/* Bouton d’aide */
+.qq-info{
+  position:relative;
+  flex:0 0 auto;
+  width:22px;
+  height:22px;
+  display:inline-grid;
+  place-items:center;
+  border:1px solid rgba(166,61,64,.22);
+  border-radius:999px;
+  background:rgba(166,61,64,.07);
+  color:var(--rouge-atelier);
+  font-size:.76rem;
+  font-weight:900;
+  line-height:1;
+  cursor:help;
+  box-shadow:none;
+  padding:0;
+}
+
+.qq-info:hover,
+.qq-info:focus{
+  outline:none;
+  background:rgba(166,61,64,.13);
+  border-color:rgba(166,61,64,.36);
+  transform:none;
+  filter:none;
+}
+
+.qq-info::after{
+  content:attr(data-tip);
+  position:absolute;
+  right:0;
+  top:calc(100% + 9px);
+  z-index:20;
+  width:min(280px,70vw);
+  padding:10px 11px;
+  border-radius:12px;
+  background:var(--bleu-atelier);
+  color:#FAFAF7;
+  font-size:.78rem;
+  font-weight:650;
+  line-height:1.42;
+  text-align:left;
+  letter-spacing:0;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(-3px);
+  transition:opacity .14s ease, transform .14s ease;
+  box-shadow:0 10px 22px rgba(0,0,0,.16);
+}
+
+.qq-info::before{
+  content:"";
+  position:absolute;
+  right:6px;
+  top:calc(100% + 4px);
+  z-index:21;
+  border:6px solid transparent;
+  border-bottom-color:var(--bleu-atelier);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .14s ease;
+}
+
+.qq-info:hover::after,
+.qq-info:focus::after,
+.qq-info:hover::before,
+.qq-info:focus::before{
+  opacity:1;
+  transform:translateY(0);
+}
+
+input[type="text"],
+textarea{
+  width:100%;
+  border:1px solid rgba(31,58,68,.14);
+  border-radius:12px;
+  background:#fff;
+  color:var(--text-main);
+  font:inherit;
+  font-size:.95rem;
+  line-height:1.5;
+  outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+input[type="text"]{
+  padding:13px 14px;
+  font-size:1.02rem;
+  font-weight:650;
+}
+
+textarea{
+  flex:1;
+  min-height:126px;
+  padding:12px 13px;
+  resize:vertical;
+}
+
+.qq-card.notes textarea{
+  min-height:170px;
+}
+
+input[type="text"]::placeholder,
+textarea::placeholder{
+  color:rgba(45,36,54,.42);
+}
+
+input[type="text"]:focus,
+textarea:focus{
+  border-color:rgba(196,122,44,.7);
+  box-shadow:0 0 0 3px rgba(196,122,44,.13);
+  background:#fffdf8;
+}
+
+.qq-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:4px;
+  padding-top:4px;
+}
+
+button{
+  appearance:none;
+  border:none;
+  border-radius:12px;
+  padding:12px 16px;
+  background:var(--bleu-atelier);
+  color:#FAFAF7;
+  font-size:.92rem;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:var(--shadow-light);
+  transition:filter .14s ease, transform .14s ease;
+}
+
+button:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+button:active{
+  transform:translateY(0);
+}
+
+button.secondary{
+  background:#E8E0D2;
+  color:var(--bleu-atelier);
+}
+
+button.danger{
+  background:rgba(166,61,64,.10);
+  color:var(--rouge-atelier);
+  box-shadow:none;
+}
+
+.qq-file-input{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+
+/* =========================================================
+   PIED DE PAGE / FOOTER
+   ========================================================= */
+
+.eigrutel-app-footer{
+  width:100%;
+  padding:24px 16px 4px;
+  text-align:center;
+}
+
+.eigrutel-app-footer a{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--bleu-atelier);
+  text-decoration:none;
+  opacity:.72;
+}
+
+.eigrutel-app-footer a:hover{
+  opacity:1;
+}
+
+/* =========================================================
+   VERSION IMPRESSION / PRINT AND PDF VERSION
+   ========================================================= */
+
+.qq-print{
+  display:none;
+}
+
+@media print{
+  @page{
+    size:A4;
+    margin:14mm;
+  }
+
+  html,
+  body{
+    background:#fff !important;
+  }
+
+  body{
+    font-family:Arial,Helvetica,sans-serif;
+    color:#111;
+  }
+
+  .qq-app{
+    max-width:none;
+    padding:0;
+  }
+
+  .qq-panel{
+    display:none;
+  }
+
+  .qq-print{
+    display:block;
+  }
+
+  .print-header{
+    border-bottom:2px solid #1F3A44;
+    padding-bottom:10px;
+    margin-bottom:14px;
+  }
+
+  .print-kicker{
+    margin:0 0 3px;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#A63D40;
+  }
+
+  .print-title{
+    margin:0;
+    font-size:28px;
+    line-height:1.1;
+    color:#1F3A44;
+    overflow-wrap:anywhere;
+  }
+
+  .print-subject{
+    margin:0 0 14px;
+    padding:10px 12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+  }
+
+  .print-subject strong{
+    display:block;
+    margin-bottom:4px;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#A63D40;
+  }
+
+  .print-subject div{
+    min-height:18px;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    font-size:15px;
+    font-weight:700;
+  }
+
+  .print-grid{
+    display:block;
+  }
+
+  .print-card{
+    display:block;
+    width:100%;
+    height:auto;
+    min-height:0;
+    overflow:visible;
+    border:1px solid #ccc;
+    border-radius:8px;
+    padding:9px 10px;
+    margin:0 0 8px;
+    break-inside:auto;
+    page-break-inside:auto;
+  }
+
+  .print-card.notes{
+    min-height:0;
+  }
+
+  .print-card h2{
+    margin:0 0 5px;
+    font-size:14px;
+    color:#1F3A44;
+  }
+
+  .print-card p{
+    display:block;
+    margin:0;
+    min-height:22px;
+    max-height:none;
+    overflow:visible;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    font-size:11.5px;
+    line-height:1.42;
+  }
+
+  .print-footer{
+    margin-top:14px;
+    padding-top:8px;
+    border-top:1px solid #ddd;
+    font-size:9px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#666;
+    text-align:center;
+  }
+}
+
+/* =========================================================
+   ADAPTATION AUX ÉCRANS / RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width:760px){
+  .qq-panel{
+    border-radius:18px;
+    padding:14px;
+  }
+
+  .qq-grid{
+    grid-template-columns:1fr;
+  }
+
+  .qq-card.notes{
+    grid-column:auto;
+  }
+
+  .qq-card{
+    min-height:180px;
+  }
+
+  .qq-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  button{
+    width:100%;
+  }
+}
+
+@media (max-width:460px){
+  .qq-app{
+    padding:14px 10px 24px;
+  }
+
+  .qq-title{
+    font-size:22px;
+    letter-spacing:-.02em;
+  }
+
+  .qq-kicker::before,
+  .qq-kicker::after{
+    width:32px;
+  }
+
+  .qq-progress{
+    width:72%;
+    margin-bottom:14px;
+  }
+
+  .qq-subject-card,
+  .qq-card{
+    padding:12px;
+  }
+
+  textarea{
+    min-height:118px;
+  }
+
+  .qq-info::after{
+    right:-8px;
+    width:min(260px,82vw);
+  }
+}
+
+.qq-language-switch{display:flex;justify-content:flex-end;margin-bottom:6px}.qq-language-switch button{padding:8px 12px;border-radius:999px;background:transparent;color:var(--bleu-atelier);border:1px solid rgba(31,58,68,.20);box-shadow:none;font-size:.78rem}.qq-language-switch button:hover{background:rgba(31,58,68,.06);transform:none}.qq-subtitle{margin:8px 0 0;color:var(--text-muted);font-size:.9rem;font-weight:700}
+@media print{.qq-language-switch{display:none!important}.qq-subtitle{font-size:10px;margin-top:3px}}
+</style>
+</head>
+
+<body>
+
+<div class="qq-app">
+
+  <main class="qq-panel" id="mainPanel" aria-label="7 Questions">
+    <div class="qq-language-switch"><button id="languageBtn" type="button" aria-label="Passer en anglais">English</button></div>
+
+    <header class="qq-hero">
+      <p class="qq-kicker" id="kicker">Scénario</p>
+
+      <h1 class="qq-title" id="dynamicTitle">7 Questions</h1>
+      <p class="qq-subtitle" id="methodSubtitle">Méthode QQOQCCP</p>
+    </header>
+
+    <div class="qq-progress" aria-label="Progression de la fiche" aria-hidden="true">
+      <span id="completionBar"></span>
+    </div>
+
+    <form class="qq-form" id="qqForm">
+
+      <section class="qq-subject-card" id="subjectCard">
+        <div class="qq-label-row">
+          <h2 class="qq-label" id="label-subject">Sujet</h2>
+          <button class="qq-info" type="button" aria-label="Aide pour le sujet" data-tip="La situation, l’idée, la scène, le problème ou la décision à éclaircir.">?</button>
+        </div>
+
+        <textarea
+          id="subject"
+          name="subject"
+          rows="2"
+          autocomplete="off"
+          placeholder="La situation, l’idée, la scène, le problème ou la décision à éclaircir."
+        ></textarea>
+      </section>
+
+      <section class="qq-grid">
+
+        <article class="qq-card" data-field="qui">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-qui">Qui ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="qui" aria-label="Verrouiller Qui" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Qui" data-tip="Personnes concernées, personnages, public, interlocuteurs, responsables.">?</button></div>
+          </div>
+          <textarea id="qui" name="qui" placeholder="Personnes concernées, personnages, public, interlocuteurs, responsables."></textarea>
+        </article>
+
+        <article class="qq-card" data-field="quand">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-quand">Quand ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="quand" aria-label="Verrouiller Quand" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Quand" data-tip="Moment, durée, urgence, ordre des événements, échéance.">?</button></div>
+          </div>
+          <textarea id="quand" name="quand" placeholder="Moment, durée, urgence, ordre des événements, échéance."></textarea>
+        </article>
+
+        <article class="qq-card" data-field="ou">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-ou">Où ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="ou" aria-label="Verrouiller Où" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Où" data-tip="Lieu réel, décor, contexte, environnement, cadre d’action.">?</button></div>
+          </div>
+          <textarea id="ou" name="ou" placeholder="Lieu réel, décor, contexte, environnement, cadre d’action."></textarea>
+        </article>
+
+        <article class="qq-card" data-field="quoi">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-quoi">Quoi ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="quoi" aria-label="Verrouiller Quoi" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Quoi" data-tip="Ce qui se passe, ce qui manque, ce qui bloque, ce qu’il faut produire.">?</button></div>
+          </div>
+          <textarea id="quoi" name="quoi" placeholder="Ce qui se passe, ce qui manque, ce qui bloque, ce qu’il faut produire."></textarea>
+        </article>
+
+        <article class="qq-card" data-field="combien">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-combien">Combien ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="combien" aria-label="Verrouiller Combien" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Combien" data-tip="Quantité, fréquence, coût, volume, temps disponible, importance.">?</button></div>
+          </div>
+          <textarea id="combien" name="combien" placeholder="Quantité, fréquence, coût, volume, temps disponible, importance."></textarea>
+        </article>
+
+        <article class="qq-card" data-field="comment">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-comment">Comment ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="comment" aria-label="Verrouiller Comment" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Comment" data-tip="Procédé, moyens, étapes, contraintes, outils, manière d’agir.">?</button></div>
+          </div>
+          <textarea id="comment" name="comment" placeholder="Procédé, moyens, étapes, contraintes, outils, manière d’agir."></textarea>
+        </article>
+
+        <article class="qq-card" data-field="pourquoi">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-pourquoi">Pourquoi ?</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="pourquoi" aria-label="Verrouiller Pourquoi" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Pourquoi" data-tip="Cause, objectif, motivation, enjeu, utilité, raison profonde.">?</button></div>
+          </div>
+          <textarea id="pourquoi" name="pourquoi" placeholder="Cause, objectif, motivation, enjeu, utilité, raison profonde."></textarea>
+        </article>
+
+        <article class="qq-card notes" data-field="notes">
+          <div class="qq-label-row">
+            <h2 class="qq-label" id="label-notes">Notes</h2>
+            <div class="qq-card-tools"><button class="qq-lock" type="button" data-lock="notes" aria-label="Verrouiller Notes" aria-pressed="false" title="Verrouiller ce champ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg></button><button class="qq-info" type="button" aria-label="Aide pour Notes" data-tip="Idées qui émergent pendant l’analyse : pistes, associations, solutions, questions à vérifier.">?</button></div>
+          </div>
+          <textarea id="notes" name="notes" placeholder="Idées qui émergent pendant l’analyse : pistes, associations, solutions, questions à vérifier."></textarea>
+        </article>
+
+      </section>
+
+      <div class="qq-actions">
+        <button id="printBtn" type="button">Exporter en PDF</button>
+        <button id="exportMarkdownBtn" class="secondary" type="button">Exporter Markdown</button>
+        <button id="saveJsonBtn" class="secondary" type="button">Sauvegarder la fiche</button>
+        <button id="loadJsonBtn" class="secondary" type="button">Charger une fiche</button>
+        <button id="clearBtn" class="danger" type="button">Réinitialiser</button>
+        <input id="jsonFileInput" class="qq-file-input" type="file" accept="application/json,.json">
+      </div>
+
+    </form>
+
+  </main>
+
+  <!-- Version propre destinée à l'impression / PDF -->
+  <section class="qq-print" aria-hidden="true">
+
+    <header class="print-header">
+      <p class="print-kicker" id="print-method">Méthode QQOQCCP</p>
+      <h1 class="print-title" id="print-title">7 Questions</h1>
+    </header>
+
+    <section class="print-subject">
+      <strong id="print-label-subject">Sujet</strong>
+      <div id="print-subject"></div>
+    </section>
+
+    <section class="print-grid">
+
+      <article class="print-card">
+        <h2 id="print-label-qui">Qui ?</h2>
+        <p id="print-qui"></p>
+      </article>
+
+      <article class="print-card">
+        <h2 id="print-label-quand">Quand ?</h2>
+        <p id="print-quand"></p>
+      </article>
+
+      <article class="print-card">
+        <h2 id="print-label-ou">Où ?</h2>
+        <p id="print-ou"></p>
+      </article>
+
+      <article class="print-card">
+        <h2 id="print-label-quoi">Quoi ?</h2>
+        <p id="print-quoi"></p>
+      </article>
+
+      <article class="print-card">
+        <h2 id="print-label-combien">Combien ?</h2>
+        <p id="print-combien"></p>
+      </article>
+
+      <article class="print-card">
+        <h2 id="print-label-comment">Comment ?</h2>
+        <p id="print-comment"></p>
+      </article>
+
+      <article class="print-card">
+        <h2 id="print-label-pourquoi">Pourquoi ?</h2>
+        <p id="print-pourquoi"></p>
+      </article>
+
+      <article class="print-card notes">
+        <h2 id="print-label-notes">Notes</h2>
+        <p id="print-notes"></p>
+      </article>
+
+    </section>
+
+    <footer class="print-footer">
+      <span id="print-footer-text">Eigrutel BD Academy — Méthode QQOQCCP</span>
+    </footer>
+
+  </section>
+
+  <footer class="eigrutel-app-footer">
+    <a href="https://www.stripmee.com" target="_blank" rel="noopener noreferrer">
+      Eigrutel BD Academy
+    </a>
+  </footer>
+
+</div>
+
+<script>
+/**
+ * FR : Logique complète de l’application, isolée dans une fonction immédiatement exécutée
+ *      afin d’éviter de créer des variables globales.
+ * EN : Complete application logic, isolated in an immediately invoked function expression
+ *      to avoid creating global variables.
+ */
+(function(){
+  const STORAGE_KEY = 'eigrutel_fiche_qqoqccp_v1';
+  const LANGUAGE_KEY = 'eigrutel_7questions_language_v1';
+  let currentLanguage = localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'fr';
+
+  const I18N = {
+    fr:{
+      htmlLang:'fr', documentTitle:'7 Questions', switchLabel:'English', switchAria:'Passer en anglais',
+      kicker:'Scénario', subtitle:'Méthode QQOQCCP', progress:'Progression de la fiche', subject:'Sujet',
+      labels:{qui:'Qui ?',quand:'Quand ?',ou:'Où ?',quoi:'Quoi ?',combien:'Combien ?',comment:'Comment ?',pourquoi:'Pourquoi ?',notes:'Notes'},
+      tips:{subject:'La situation, l’idée, la scène, le problème ou la décision à éclaircir.',qui:'Personnes concernées, personnages, public, interlocuteurs, responsables.',quand:'Moment, durée, urgence, ordre des événements, échéance.',ou:'Lieu réel, décor, contexte, environnement, cadre d’action.',quoi:'Ce qui se passe, ce qui manque, ce qui bloque, ce qu’il faut produire.',combien:'Quantité, fréquence, coût, volume, temps disponible, importance.',comment:'Procédé, moyens, étapes, contraintes, outils, manière d’agir.',pourquoi:'Cause, objectif, motivation, enjeu, utilité, raison profonde.',notes:'Idées qui émergent pendant l’analyse : pistes, associations, solutions, questions à vérifier.'},
+      actions:{print:'Exporter en PDF',markdown:'Exporter Markdown',save:'Sauvegarder la fiche',load:'Charger une fiche',reset:'Réinitialiser'},
+      lock:'Verrouiller',unlock:'Déverrouiller',lockField:'Verrouiller ce champ',unlockField:'Déverrouiller ce champ',collapse:'Replier',expand:'Déplier',collapseField:'Replier ce champ',expandField:'Déplier ce champ',
+      resetConfirm:'Réinitialiser toute la fiche ?',invalidJson:'Fichier JSON invalide.',loadError:'Impossible de charger cette fiche JSON.',readError:'Impossible de lire ce fichier.',
+      methodLine:'Méthode QQOQCCP — Eigrutel BD Academy', footer:'Eigrutel BD Academy — Méthode QQOQCCP'
+    },
+    en:{
+      htmlLang:'en', documentTitle:'7 Questions', switchLabel:'Français', switchAria:'Switch to French',
+      kicker:'Story', subtitle:'5W2H Method', progress:'Sheet completion', subject:'Subject',
+      labels:{qui:'Who?',quand:'When?',ou:'Where?',quoi:'What?',combien:'How much?',comment:'How?',pourquoi:'Why?',notes:'Notes'},
+      tips:{subject:'The situation, idea, scene, problem, or decision to clarify.',qui:'Characters involved, cast, audience, speakers, people responsible.',quand:'Timing, duration, urgency, sequence of events, deadline.',ou:'Location, setting, backdrop, environment, visual frame of the action.',quoi:'What happens, what is missing, what blocks the scene, what needs to be produced.',combien:'Quantity, frequency, cost, volume, available time, scale, importance.',comment:'Process, means, steps, constraints, tools, way the action unfolds.',pourquoi:'Cause, goal, motivation, stakes, usefulness, deeper reason.',notes:'Ideas that emerge during the analysis: leads, associations, solutions, questions to check.'},
+      actions:{print:'Export PDF',markdown:'Export Markdown',save:'Save sheet',load:'Load sheet',reset:'Reset'},
+      lock:'Lock',unlock:'Unlock',lockField:'Lock this field',unlockField:'Unlock this field',collapse:'Collapse',expand:'Expand',collapseField:'Collapse this field',expandField:'Expand this field',
+      resetConfirm:'Reset the entire sheet?',invalidJson:'Invalid JSON file.',loadError:'Unable to load this JSON sheet.',readError:'Unable to read this file.',
+      methodLine:'5W2H Method — Eigrutel BD Academy', footer:'Eigrutel BD Academy — 5W2H Method'
+    }
+  };
+  /**
+   * FR : Retourne le dictionnaire de traduction correspondant à la langue active.
+   * EN : Returns the translation dictionary for the active language.
+   * @returns {Object} Textes d’interface / Interface strings.
+   */
+  function t(){ return I18N[currentLanguage]; }
+
+
+  const fields = [
+    'subject',
+    'qui',
+    'quand',
+    'ou',
+    'quoi',
+    'combien',
+    'comment',
+    'pourquoi',
+    'notes'
+  ];
+
+  const lockableFields = [
+    'qui',
+    'quand',
+    'ou',
+    'quoi',
+    'combien',
+    'comment',
+    'pourquoi',
+    'notes'
+  ];
+
+  const form = document.getElementById('qqForm');
+  const printBtn = document.getElementById('printBtn');
+  const exportMarkdownBtn = document.getElementById('exportMarkdownBtn');
+  const saveJsonBtn = document.getElementById('saveJsonBtn');
+  const loadJsonBtn = document.getElementById('loadJsonBtn');
+  const jsonFileInput = document.getElementById('jsonFileInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const dynamicTitle = document.getElementById('dynamicTitle');
+  const printTitle = document.getElementById('print-title');
+  const subjectCard = document.getElementById('subjectCard');
+  const completionBar = document.getElementById('completionBar');
+  const languageBtn = document.getElementById('languageBtn');
+
+  let saveTimer = null;
+  const locked = {};
+  const collapsed = {};
+
+  // FR : Initialise l’état de verrouillage et de repli de chaque carte.
+  // EN : Initializes the lock and collapse state of every card.
+  lockableFields.forEach(id => {
+    locked[id] = false;
+    collapsed[id] = false;
+  });
+
+  const lockIcons = {
+    open: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 7.3-2.3l-1.4 1A2.3 2.3 0 0 0 9.7 7v2H8Z"/></svg>',
+    closed: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 10h12a1.8 1.8 0 0 1 1.8 1.8v6.4A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8v-6.4A1.8 1.8 0 0 1 6 10Zm2-1V7a4 4 0 0 1 8 0v2h-1.8V7a2.2 2.2 0 0 0-4.4 0v2H8Z"/></svg>'
+  };
+
+  const collapseIcon = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg>';
+
+  /**
+   * FR : Crée et insère les boutons permettant de replier ou déplier chaque carte.
+   * EN : Creates and inserts the buttons used to collapse or expand each card.
+   */
+  function setupCollapseButtons(){
+    // FR : Fonction de rappel exécutée pour chaque carte du formulaire.
+    // EN : Callback executed for each form card.
+    document.querySelectorAll('.qq-card[data-field]').forEach(card => {
+      const id = card.getAttribute('data-field');
+      if(!id || !lockableFields.includes(id)) return;
+
+      const tools = card.querySelector('.qq-card-tools');
+      if(!tools || tools.querySelector('.qq-collapse')) return;
+
+      const button = document.createElement('button');
+      button.className = 'qq-collapse';
+      button.type = 'button';
+      button.setAttribute('data-collapse', id);
+      button.setAttribute('aria-label', t().collapse + ' ' + t().labels[id].replace(' ?','').replace('?',''));
+      button.setAttribute('aria-expanded', 'true');
+      button.setAttribute('title', t().collapseField);
+      button.innerHTML = collapseIcon;
+
+      tools.insertBefore(button, tools.firstChild);
+    });
+  }
+
+
+  /**
+   * FR : Transforme un texte en nom de fichier simple, sûr et lisible.
+   * EN : Converts text into a simple, safe and readable file name.
+   * @param {string} value Texte à convertir / Text to convert.
+   * @returns {string} Nom de fichier normalisé / Normalized file name.
+   */
+  function slugifyFileName(value){
+    return (value || '7-questions')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-zA-Z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'')
+      .toLowerCase()
+      .slice(0,60) || '7-questions';
+  }
+
+  /**
+   * FR : Regroupe le contenu de la fiche et son état dans un objet exportable en JSON.
+   * EN : Collects the sheet content and state into an object that can be exported as JSON.
+   * @returns {Object} Données portables de la fiche / Portable sheet data.
+   */
+  function buildPortableData(){
+    const fieldData = {};
+    // FR : Fonction de rappel copiant la valeur de chaque champ.
+    // EN : Callback copying the value of each field.
+    fields.forEach(id => {
+      fieldData[id] = getField(id).value || '';
+    });
+
+    return {
+      app:'eigrutel-7-questions',
+      version:1,
+      exportedAt:new Date().toISOString(),
+      title:getCurrentTitle(),
+      fields:fieldData,
+      locked:{...locked},
+      collapsed:{...collapsed}
+    };
+  }
+
+  /**
+   * FR : Valide puis applique les données provenant d’un fichier JSON exporté.
+   * EN : Validates and applies data from an exported JSON file.
+   * @param {Object} data Données à importer / Data to import.
+   */
+  function importPortableData(data){
+    if(!data || typeof data !== 'object'){
+      throw new Error(t().invalidJson);
+    }
+
+    const sourceFields = data.fields && typeof data.fields === 'object' ? data.fields : data;
+
+    fields.forEach(id => {
+      if(Object.prototype.hasOwnProperty.call(sourceFields,id)){
+        getField(id).value = sourceFields[id] || '';
+      }
+    });
+
+    const sourceLocks = data.locked || data._locked || {};
+    const sourceCollapsed = data.collapsed || data._collapsed || {};
+    lockableFields.forEach(id => {
+      locked[id] = Boolean(sourceLocks[id]);
+      collapsed[id] = Boolean(sourceCollapsed[id]);
+    });
+
+    saveData();
+    refreshAll();
+  }
+
+  /**
+   * FR : Génère et télécharge une sauvegarde JSON de la fiche actuelle.
+   * EN : Generates and downloads a JSON backup of the current sheet.
+   */
+  function exportJsonFile(){
+    const data = buildPortableData();
+    const json = JSON.stringify(data,null,2);
+    const blob = new Blob([json], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const name = slugifyFileName(data.title);
+
+    a.href = url;
+    a.download = '7-questions-' + name + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * FR : Normalise un texte avant son insertion dans le document Markdown.
+   * EN : Normalizes text before inserting it into the Markdown document.
+   * @param {string} value Texte source / Source text.
+   * @returns {string} Texte normalisé / Normalized text.
+   */
+  function escapeMarkdown(value){
+    return (value || '')
+      .toString()
+      .replace(/\r\n/g,'\n')
+      .replace(/\r/g,'\n')
+      .trim();
+  }
+
+  /**
+   * FR : Construit le contenu Markdown complet à partir de la fiche.
+   * EN : Builds the complete Markdown content from the sheet.
+   * @returns {string} Document Markdown / Markdown document.
+   */
+  function buildMarkdown(){
+    const data = buildPortableData();
+    const title = escapeMarkdown(data.title || '7 Questions');
+
+    const labels = [
+      ['subject',t().subject],
+      ...lockableFields.map(id => [id,t().labels[id]])
+    ];
+
+    const lines = [
+      '# ' + title,
+      '',
+      '> ' + t().methodLine,
+      ''
+    ];
+
+    labels.forEach(([id,label]) => {
+      const value = escapeMarkdown(data.fields[id]);
+      lines.push('## ' + label);
+      lines.push('');
+      lines.push(value || ' ');
+      lines.push('');
+    });
+
+    return lines.join('\n').replace(/\n{4,}/g,'\n\n\n');
+  }
+
+  /**
+   * FR : Génère et télécharge la fiche au format Markdown.
+   * EN : Generates and downloads the sheet as a Markdown file.
+   */
+  function exportMarkdownFile(){
+    const markdown = buildMarkdown();
+    const blob = new Blob([markdown], {type:'text/markdown;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const name = slugifyFileName(getCurrentTitle());
+
+    a.href = url;
+    a.download = '7-questions-' + name + '.md';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * FR : Lit un fichier JSON local, puis transmet son contenu à la fonction d’import.
+   * EN : Reads a local JSON file, then passes its content to the import function.
+   * @param {File} file Fichier sélectionné / Selected file.
+   */
+  function loadJsonFile(file){
+    if(!file) return;
+
+    const reader = new FileReader();
+    // FR : Fonction appelée lorsque la lecture du fichier est terminée.
+    // EN : Function called when file reading is complete.
+    reader.onload = function(){
+      try{
+        const data = JSON.parse(reader.result);
+        importPortableData(data);
+      }catch(error){
+        alert(t().loadError);
+      }finally{
+        jsonFileInput.value = '';
+      }
+    };
+    // FR : Fonction appelée lorsqu’une erreur de lecture survient.
+    // EN : Function called when a file-reading error occurs.
+    reader.onerror = function(){
+      alert(t().readError);
+      jsonFileInput.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  /**
+   * FR : Raccourci centralisé pour récupérer un champ par son identifiant HTML.
+   * EN : Centralized shortcut for retrieving a field by its HTML identifier.
+   * @param {string} id Identifiant du champ / Field identifier.
+   * @returns {HTMLElement|null} Élément trouvé / Matching element.
+   */
+  function getField(id){
+    return document.getElementById(id);
+  }
+
+  /**
+   * FR : Prépare les données destinées à la sauvegarde automatique du navigateur.
+   * EN : Prepares the data used by the browser’s automatic local save.
+   * @returns {Object} État local de la fiche / Local sheet state.
+   */
+  function getData(){
+    const data = {};
+    // FR : Fonction de rappel collectant les valeurs pour la sauvegarde locale.
+    // EN : Callback collecting field values for local storage.
+    fields.forEach(id => {
+      data[id] = getField(id).value || '';
+    });
+    data._locked = {...locked};
+    data._collapsed = {...collapsed};
+    return data;
+  }
+
+  /**
+   * FR : Restaure les champs, les verrouillages et les cartes repliées depuis un objet.
+   * EN : Restores fields, locks and collapsed cards from an object.
+   * @param {Object} data État à restaurer / State to restore.
+   */
+  function setData(data){
+    // FR : Fonction de rappel restaurant chaque champ disponible.
+    // EN : Callback restoring each available field.
+    fields.forEach(id => {
+      if(data && Object.prototype.hasOwnProperty.call(data,id)){
+        getField(id).value = data[id];
+      }
+    });
+
+    if(data && data._locked){
+      // FR : Fonction de rappel restaurant chaque verrouillage local.
+      // EN : Callback restoring each local lock state.
+      lockableFields.forEach(id => {
+        locked[id] = Boolean(data._locked[id]);
+      });
+    }
+
+    if(data && data._collapsed){
+      // FR : Fonction de rappel restaurant chaque état replié local.
+      // EN : Callback restoring each local collapsed state.
+      lockableFields.forEach(id => {
+        collapsed[id] = Boolean(data._collapsed[id]);
+      });
+    }
+  }
+
+  /**
+   * FR : Utilise le sujet comme titre de document, avec un titre de secours.
+   * EN : Uses the subject as the document title, with a fallback title.
+   * @returns {string} Titre courant / Current title.
+   */
+  function getCurrentTitle(){
+    const subject = getField('subject').value.trim();
+    return subject || '7 Questions';
+  }
+
+  /**
+   * FR : Met à jour le titre visible et le titre de la version imprimée.
+   * EN : Updates the visible title and the print-version title.
+   */
+  function updateTitle(){
+    const title = getCurrentTitle();
+    dynamicTitle.textContent = '7 Questions';
+    printTitle.textContent = title;
+  }
+
+  /**
+   * FR : Ajoute un style visuel aux cartes contenant déjà du texte.
+   * EN : Adds a visual style to cards that already contain text.
+   */
+  function updateFilledStates(){
+    // FR : Fonction de rappel vérifiant si chaque champ contient du texte.
+    // EN : Callback checking whether each field contains text.
+    fields.forEach(id => {
+      const filled = getField(id).value.trim().length > 0;
+
+      if(id === 'subject'){
+        subjectCard.classList.toggle('is-filled', filled);
+        return;
+      }
+
+      const card = document.querySelector('.qq-card[data-field="' + id + '"]');
+      if(card){
+        card.classList.toggle('is-filled', filled);
+      }
+    });
+  }
+
+  /**
+   * FR : Calcule le taux de remplissage et actualise la barre de progression.
+   * EN : Calculates the completion rate and updates the progress bar.
+   */
+  function updateCompletion(){
+    // FR : Fonction de filtre comptant les champs remplis.
+    // EN : Filter callback counting completed fields.
+    const completed = fields.filter(id => getField(id).value.trim().length > 0).length;
+    const percent = Math.round((completed / fields.length) * 100);
+
+    if(completionBar){
+      completionBar.style.width = percent + '%';
+    }
+  }
+
+  /**
+   * FR : Applique l’état verrouillé ou déverrouillé aux champs et à leurs boutons.
+   * EN : Applies the locked or unlocked state to fields and their buttons.
+   */
+  function updateLocks(){
+    // FR : Fonction de rappel appliquant le verrouillage à chaque carte.
+    // EN : Callback applying the lock state to each card.
+    lockableFields.forEach(id => {
+      const field = getField(id);
+      const button = document.querySelector('.qq-lock[data-lock="' + id + '"]');
+      const card = document.querySelector('.qq-card[data-field="' + id + '"]');
+      const isLocked = Boolean(locked[id]);
+
+      field.readOnly = isLocked;
+      field.setAttribute('aria-readonly', isLocked ? 'true' : 'false');
+
+      if(button){
+        button.classList.toggle('is-locked', isLocked);
+        button.setAttribute('aria-pressed', isLocked ? 'true' : 'false');
+        button.setAttribute('aria-label', (isLocked ? t().unlock : t().lock) + ' ' + t().labels[id].replace(' ?','').replace('?',''));
+        button.setAttribute('title', isLocked ? t().unlockField : t().lockField);
+        button.innerHTML = isLocked ? lockIcons.closed : lockIcons.open;
+      }
+
+      if(card){
+        card.classList.toggle('is-locked', isLocked);
+      }
+    });
+  }
+
+  /**
+   * FR : Applique l’état replié ou déplié aux cartes et met à jour l’accessibilité.
+   * EN : Applies the collapsed or expanded state to cards and updates accessibility attributes.
+   */
+  function updateCollapsedCards(){
+    // FR : Fonction de rappel appliquant le repli à chaque carte.
+    // EN : Callback applying the collapsed state to each card.
+    lockableFields.forEach(id => {
+      const button = document.querySelector('.qq-collapse[data-collapse="' + id + '"]');
+      const card = document.querySelector('.qq-card[data-field="' + id + '"]');
+      const isCollapsed = Boolean(collapsed[id]);
+
+      if(button){
+        button.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        button.setAttribute('aria-label', (isCollapsed ? t().expand : t().collapse) + ' ' + t().labels[id].replace(' ?','').replace('?',''));
+        button.setAttribute('title', isCollapsed ? t().expandField : t().collapseField);
+      }
+
+      if(card){
+        card.classList.toggle('is-collapsed', isCollapsed);
+      }
+    });
+  }
+
+  /**
+   * FR : Enregistre immédiatement l’état courant dans le stockage local du navigateur.
+   * EN : Immediately saves the current state to the browser’s local storage.
+   */
+  function saveData(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getData()));
+  }
+
+  /**
+   * FR : Retarde légèrement la sauvegarde automatique pour éviter les écritures à chaque frappe.
+   * EN : Slightly delays automatic saving to avoid writing on every keystroke.
+   */
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveData, 250);
+  }
+
+  /**
+   * FR : Charge la dernière fiche conservée dans le stockage local du navigateur.
+   * EN : Loads the latest sheet stored in the browser’s local storage.
+   */
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      setData(data);
+    }catch(error){
+      // Sauvegarde locale illisible : on repart sans bloquer l’outil.
+    }
+  }
+
+  /**
+   * FR : Copie les données courantes dans la mise en page réservée à l’impression.
+   * EN : Copies the current data into the print-only layout.
+   */
+  function updatePrintVersion(){
+    updateTitle();
+
+    // FR : Fonction de rappel copiant chaque champ vers la version imprimée.
+    // EN : Callback copying each field into the print version.
+    fields.forEach(id => {
+      const printEl = document.getElementById('print-' + id);
+      if(!printEl) return;
+
+      const value = getField(id).value.trim();
+      printEl.textContent = value || ' ';
+    });
+  }
+
+  /**
+   * FR : Traduit toute l’interface et mémorise éventuellement la langue choisie.
+   * EN : Translates the entire interface and optionally remembers the selected language.
+   * @param {boolean} savePreference Enregistrer ou non le choix / Whether to store the choice.
+   */
+  function applyLanguage(savePreference = true){
+    const lang = t();
+    document.documentElement.lang = lang.htmlLang;
+    document.title = lang.documentTitle;
+    languageBtn.textContent = lang.switchLabel;
+    languageBtn.setAttribute('aria-label', lang.switchAria);
+    document.getElementById('kicker').textContent = lang.kicker;
+    document.getElementById('methodSubtitle').textContent = lang.subtitle;
+    document.getElementById('mainPanel').setAttribute('aria-label', '7 Questions — ' + lang.subtitle);
+    document.querySelector('.qq-progress').setAttribute('aria-label', lang.progress);
+    document.getElementById('label-subject').textContent = lang.subject;
+    const subjectInfo = subjectCard.querySelector('.qq-info');
+    subjectInfo.dataset.tip = lang.tips.subject;
+    subjectInfo.setAttribute('aria-label', currentLanguage === 'fr' ? 'Aide pour le sujet' : 'Help for subject');
+    getField('subject').placeholder = lang.tips.subject;
+
+    // FR : Fonction de rappel traduisant les éléments de chaque carte.
+    // EN : Callback translating the elements of each card.
+    lockableFields.forEach(id => {
+      document.getElementById('label-' + id).textContent = lang.labels[id];
+      document.getElementById('print-label-' + id).textContent = lang.labels[id];
+      const card = document.querySelector('.qq-card[data-field="' + id + '"]');
+      const info = card.querySelector('.qq-info');
+      info.dataset.tip = lang.tips[id];
+      info.setAttribute('aria-label', (currentLanguage === 'fr' ? 'Aide pour ' : 'Help for ') + lang.labels[id].replace(' ?','').replace('?',''));
+      getField(id).placeholder = lang.tips[id];
+    });
+
+    printBtn.textContent = lang.actions.print;
+    exportMarkdownBtn.textContent = lang.actions.markdown;
+    saveJsonBtn.textContent = lang.actions.save;
+    loadJsonBtn.textContent = lang.actions.load;
+    clearBtn.textContent = lang.actions.reset;
+    document.getElementById('print-method').textContent = lang.subtitle;
+    document.getElementById('print-label-subject').textContent = lang.subject;
+    document.getElementById('print-footer-text').textContent = lang.footer;
+    if(savePreference) localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+    updateLocks();
+    updateCollapsedCards();
+    updatePrintVersion();
+  }
+
+  /**
+   * FR : Actualise en une seule fois tous les éléments calculés de l’interface.
+   * EN : Refreshes all computed interface elements in a single call.
+   */
+  function refreshAll(){
+    updateTitle();
+    updateFilledStates();
+    updateCompletion();
+    updateLocks();
+    updateCollapsedCards();
+    updatePrintVersion();
+  }
+
+  /**
+   * FR : Demande confirmation, vide la fiche et réinitialise tous ses états.
+   * EN : Requests confirmation, clears the sheet and resets all its states.
+   */
+  function clearAll(){
+    const ok = confirm(t().resetConfirm);
+    if(!ok) return;
+
+    // FR : Fonction de rappel vidant chaque champ.
+    // EN : Callback clearing each field.
+    fields.forEach(id => {
+      getField(id).value = '';
+    });
+
+    // FR : Fonction de rappel réinitialisant les états des cartes.
+    // EN : Callback resetting card states.
+    lockableFields.forEach(id => {
+      locked[id] = false;
+      collapsed[id] = false;
+    });
+
+    localStorage.removeItem(STORAGE_KEY);
+    refreshAll();
+    getField('subject').focus();
+  }
+
+  /* =========================================================
+     INITIALISATION / INITIALIZATION
+     ========================================================= */
+
+  setupCollapseButtons();
+
+  // FR : Branche les événements de saisie sur tous les champs.
+  // EN : Attaches input events to all fields.
+  fields.forEach(id => {
+    const el = getField(id);
+    // FR : Fonction appelée après chaque modification d’un champ.
+    // EN : Function called after each field edit.
+    el.addEventListener('input', () => {
+      scheduleSave();
+      refreshAll();
+    });
+  });
+
+  // FR : Branche les commandes de verrouillage.
+  // EN : Attaches lock controls.
+  document.querySelectorAll('.qq-lock[data-lock]').forEach(button => {
+    // FR : Fonction appelée lors d’un clic sur un cadenas.
+    // EN : Function called when a lock button is clicked.
+    button.addEventListener('click', () => {
+      const id = button.getAttribute('data-lock');
+      locked[id] = !locked[id];
+      updateLocks();
+      saveData();
+    });
+  });
+
+  // FR : Branche les commandes de repli.
+  // EN : Attaches collapse controls.
+  document.querySelectorAll('.qq-collapse[data-collapse]').forEach(button => {
+    // FR : Fonction appelée lors d’un clic sur un bouton de repli.
+    // EN : Function called when a collapse button is clicked.
+    button.addEventListener('click', () => {
+      const id = button.getAttribute('data-collapse');
+      collapsed[id] = !collapsed[id];
+      updateCollapsedCards();
+      saveData();
+    });
+  });
+
+  // FR : Fonction appelée pour basculer entre le français et l’anglais.
+  // EN : Function called to switch between French and English.
+  languageBtn.addEventListener('click', () => {
+    currentLanguage = currentLanguage === 'fr' ? 'en' : 'fr';
+    applyLanguage(true);
+  });
+
+  // FR : Fonction appelée pour préparer puis ouvrir l’impression PDF.
+  // EN : Function called to prepare and open PDF printing.
+  printBtn.addEventListener('click', () => {
+    saveData();
+    updatePrintVersion();
+    window.print();
+  });
+
+  // FR : Fonction appelée pour exporter le document Markdown.
+  // EN : Function called to export the Markdown document.
+  exportMarkdownBtn.addEventListener('click', () => {
+    saveData();
+    exportMarkdownFile();
+  });
+
+  // FR : Fonction appelée pour exporter une sauvegarde JSON.
+  // EN : Function called to export a JSON backup.
+  saveJsonBtn.addEventListener('click', () => {
+    saveData();
+    exportJsonFile();
+  });
+
+  // FR : Fonction appelée pour ouvrir le sélecteur de fichier JSON.
+  // EN : Function called to open the JSON file picker.
+  loadJsonBtn.addEventListener('click', () => {
+    jsonFileInput.click();
+  });
+
+  // FR : Fonction appelée après la sélection d’un fichier JSON.
+  // EN : Function called after a JSON file is selected.
+  jsonFileInput.addEventListener('change', () => {
+    loadJsonFile(jsonFileInput.files && jsonFileInput.files[0]);
+  });
+
+  clearBtn.addEventListener('click', clearAll);
+
+  window.addEventListener('beforeprint', updatePrintVersion);
+
+  // FR : Fonction empêchant l’envoi HTML classique du formulaire.
+  // EN : Function preventing the form’s default HTML submission.
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+  });
+
+  loadData();
+  applyLanguage(false);
+  refreshAll();
+})();
+</script>
+
+</body>
+</html>
