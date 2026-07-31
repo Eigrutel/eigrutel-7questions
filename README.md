@@ -4,6 +4,15 @@
 
 Application web bilingue fondée sur les méthodes **QQOQCCP** en français et **5W2H** en anglais.
 
+## Aperçu
+
+![Interface française de 7 questions](docs/images/7questions-FR.png)
+
+<p align="center">
+  <img src="docs/images/7questions-EN.png" alt="English interface" width="48%">
+  <img src="docs/images/7questions-mobile.png" alt="Version mobile" width="30%">
+</p>
+
 **7 questions** permet d’examiner un sujet, une situation, une scène, un problème ou une décision à travers sept interrogations :
 
 - Qui ? / Who?
