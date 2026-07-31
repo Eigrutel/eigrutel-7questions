@@ -9,7 +9,7 @@ Application web bilingue fondée sur les méthodes **QQOQCCP** en français et *
 ![Interface française de 7 questions](docs/images/7questions-FR.png)
 
 <p align="center">
-  <img src="docs/images/7questions-EN.png" alt="English interface" width="48%">
+  
   <img src="docs/images/7questions-mobile.png" alt="Version mobile" width="30%">
 </p>
 
