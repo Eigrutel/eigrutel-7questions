@@ -6,11 +6,11 @@ Application web bilingue fondée sur les méthodes **QQOQCCP** en français et *
 
 ## Aperçu
 
-![Interface française de 7 questions](docs/images/7questions-FR.png)
 
 <p align="center">
   
-  <img src="docs/images/7questions-mobile.png" alt="Version mobile" width="30%">
+  <img src="docs/images/7questions-fr.png" alt="french interface" width="48%">
+  <img src="docs/images/7questions-mobile.png" alt="Version mobile" width="32%">
 </p>
 
 **7 questions** permet d’examiner un sujet, une situation, une scène, un problème ou une décision à travers sept interrogations :
