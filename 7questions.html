@@ -1,5 +1,5 @@
-<!-- Eigrutel Lab - Atelier d'outils libres pour la bande dessinée Programme conçu et développé par Simon Léturgie dans le cadre d'Eigrutel BD Academy. Nom : 7 questions Version : 1.0.0 Date : 29-07-2026
-JJ Code : GNU AGPL v3.0 ou version ultérieure. Documentation et modèles : CC BY-SA 4.0,
+<!-- Eigrutel Lab - Atelier d'outils libres pour la bande dessinée Programme conçu et développé par Simon Léturgie dans le cadre d'Eigrutel BD Academy. Nom : 7 questions Version : 1.0.1 Date : 11-09-2026
+Code : GNU AGPL v3.0 ou version ultérieure. Documentation et modèles : CC BY-SA 4.0,
 sauf mention contraire. Marques, logos et signes distinctifs Eigrutel / Eigrutel Lab / Eigrutel BD Academy : réservés. -->
 <!DOCTYPE html>
 <!--
@@ -13,6 +13,53 @@ sauf mention contraire. Marques, logos et signes distinctifs Eigrutel / Eigrutel
 
 <html lang="fr">
 <head>
+<script>
+
+// Eigrutel Projets bridge v0.1.0 — isolated in-memory working copy.
+const eigrutelEmbedded = window.parent !== window && new URLSearchParams(location.search).get('projets') === '1';
+
+// Read a native JSON or extract only this application's payload from Projets v1.
+function extractEigrutelProject(input, tool, language) {
+  if(!input || input.app !== 'eigrutel-projets')return input;
+  const en=language==='en';
+  const fail=(fr,enText)=>{const e=new Error(en?enText:fr);e.importMessage=true;throw e;};
+  if(input.version!==1)fail('Version du fichier Projets non prise en charge.','Unsupported Projets file version.');
+  const project=input.project;
+  if(!project || typeof project!=='object' || Array.isArray(project) || !project.tools || typeof project.tools!=='object' || Array.isArray(project.tools))
+    fail('Le fichier Projets est incomplet ou invalide.','The Projets file is incomplete or invalid.');
+  if(!Object.prototype.hasOwnProperty.call(project.tools,tool) || project.tools[tool]===null || project.tools[tool]===undefined)
+    fail('Ce fichier Projets ne contient pas de données pour '+(tool==='personnages'?'Personnages':tool==='univers'?'Univers':tool==='7questions'?'7 Questions':tool==='scenoscope'?'Scénoscope':'Boussole')+'.','This Projets file contains no data for '+(tool==='personnages'?'Characters':tool==='univers'?'Universe':tool==='7questions'?'7 Questions':tool==='scenoscope'?'Scénoscope':'Compass')+'.');
+  const data=project.tools[tool];
+  if(typeof data!=='object' || Array.isArray(data))fail('Les données de cette application sont invalides.','The application data is invalid.');
+  const result=JSON.parse(JSON.stringify(data));
+  if(tool==='personnages' && typeof project.name==='string')result.projectName=project.name;
+  if(tool==='univers' && !result.projectTitle && typeof project.name==='string')result.projectTitle=project.name;
+  return result;
+}
+
+const eigrutelMemory = new Map();
+let eigrutelPending=0;
+class EigrutelFileReader extends FileReader {
+ constructor(){super();this.addEventListener('loadstart',()=>{eigrutelPending++;});this.addEventListener('loadend',()=>{eigrutelPending=Math.max(0,eigrutelPending-1);});}
+}
+const eigrutelLocal = eigrutelEmbedded ? {
+ get length(){return eigrutelMemory.size;},key:i=>Array.from(eigrutelMemory.keys())[i]??null,
+ getItem:k=>eigrutelMemory.has(k)?eigrutelMemory.get(k):null,
+ setItem:(k,v)=>eigrutelMemory.set(k,String(v)), removeItem:k=>eigrutelMemory.delete(k)
+} : window.localStorage;
+
+function validateQuestionsData(d){
+ const obj=x=>x&&typeof x==='object'&&!Array.isArray(x);
+ const fail=()=>{throw new Error('Ce fichier ne contient pas une fiche 7 Questions valide.');};
+ if(!obj(d)||(d.app&&d.app!=='eigrutel-7-questions'))fail();
+ const f=d.fields===undefined?d:d.fields;
+ const keys=['subject','qui','quand','ou','quoi','combien','comment','pourquoi','notes'];
+ if(!obj(f)||!keys.some(k=>Object.prototype.hasOwnProperty.call(f,k)))fail();
+ for(const k of keys)if(f[k]!==undefined&&typeof f[k]!=='string')fail();
+ for(const k of ['locked','collapsed','_locked','_collapsed'])if(d[k]!==undefined&&(!obj(d[k])||Object.values(d[k]).some(v=>typeof v!=='boolean')))fail();
+ return d;
+}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>7 questions</title>
@@ -1001,7 +1048,7 @@ button.danger{
 (function(){
   const STORAGE_KEY = 'eigrutel_fiche_qqoqccp_v1';
   const LANGUAGE_KEY = 'eigrutel_7questions_language_v1';
-  let currentLanguage = localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'fr';
+  let currentLanguage = eigrutelLocal.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'fr';
 
   const I18N = {
     fr:{
@@ -1148,6 +1195,7 @@ button.danger{
     return {
       app:'eigrutel-7-questions',
       version:1,
+      language:currentLanguage,
       exportedAt:new Date().toISOString(),
       title:getCurrentTitle(),
       fields:fieldData,
@@ -1162,17 +1210,12 @@ button.danger{
    * @param {Object} data Données à importer / Data to import.
    */
   function importPortableData(data){
-    if(!data || typeof data !== 'object'){
-      throw new Error(t().invalidJson);
-    }
-
+    data=JSON.parse(JSON.stringify(validateQuestionsData(extractEigrutelProject(data,'7questions',currentLanguage))));
+    clearTimeout(saveTimer);
+    currentLanguage=data.language==='en'?'en':'fr';
     const sourceFields = data.fields && typeof data.fields === 'object' ? data.fields : data;
 
-    fields.forEach(id => {
-      if(Object.prototype.hasOwnProperty.call(sourceFields,id)){
-        getField(id).value = sourceFields[id] || '';
-      }
-    });
+    fields.forEach(id => {getField(id).value=sourceFields[id]||'';});
 
     const sourceLocks = data.locked || data._locked || {};
     const sourceCollapsed = data.collapsed || data._collapsed || {};
@@ -1181,6 +1224,7 @@ button.danger{
       collapsed[id] = Boolean(sourceCollapsed[id]);
     });
 
+    applyLanguage(true);
     saveData();
     refreshAll();
   }
@@ -1278,7 +1322,7 @@ button.danger{
   function loadJsonFile(file){
     if(!file) return;
 
-    const reader = new FileReader();
+    const reader = new EigrutelFileReader();
     // FR : Fonction appelée lorsque la lecture du fichier est terminée.
     // EN : Function called when file reading is complete.
     reader.onload = function(){
@@ -1286,7 +1330,7 @@ button.danger{
         const data = JSON.parse(reader.result);
         importPortableData(data);
       }catch(error){
-        alert(t().loadError);
+        alert(error.message || t().loadError);
       }finally{
         jsonFileInput.value = '';
       }
@@ -1474,7 +1518,7 @@ button.danger{
    * EN : Immediately saves the current state to the browser’s local storage.
    */
   function saveData(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(getData()));
+    eigrutelLocal.setItem(STORAGE_KEY, JSON.stringify(getData()));
   }
 
   /**
@@ -1492,7 +1536,7 @@ button.danger{
    */
   function loadData(){
     try{
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = eigrutelLocal.getItem(STORAGE_KEY);
       if(!raw) return;
       const data = JSON.parse(raw);
       setData(data);
@@ -1560,7 +1604,7 @@ button.danger{
     document.getElementById('print-method').textContent = lang.subtitle;
     document.getElementById('print-label-subject').textContent = lang.subject;
     document.getElementById('print-footer-text').textContent = lang.footer;
-    if(savePreference) localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+    if(savePreference) eigrutelLocal.setItem(LANGUAGE_KEY, currentLanguage);
     updateLocks();
     updateCollapsedCards();
     updatePrintVersion();
@@ -1600,7 +1644,7 @@ button.danger{
       collapsed[id] = false;
     });
 
-    localStorage.removeItem(STORAGE_KEY);
+    eigrutelLocal.removeItem(STORAGE_KEY);
     refreshAll();
     getField('subject').focus();
   }
@@ -1700,11 +1744,55 @@ button.danger{
     e.preventDefault();
   });
 
+
+  window.EigrutelApp={
+    get(){const d=buildPortableData();delete d.exportedAt;return d;},
+    set(input,name){
+      const d=JSON.parse(JSON.stringify(validateQuestionsData(extractEigrutelProject(input,'7questions',currentLanguage))));
+      const f=d.fields||d;
+      if(!f.subject&&name)f.subject=name;
+      importPortableData(d);
+    }
+  };
   loadData();
   applyLanguage(false);
   refreshAll();
 })();
 </script>
 
+<script>
+
+if(eigrutelEmbedded) {
+ let loaded=false, signature='', revision=0, acknowledged=0, initId='', timer;
+ const send=(type,more={})=>parent.postMessage({channel:'eigrutel-projets-v1',appId:'7questions',type,initId,...more},location.origin);
+ const report=(requestId)=>{
+   if(!loaded) return;
+   if(eigrutelPending>0){if(requestId)setTimeout(()=>report(requestId),100);return;}
+   try {
+     const data=window.EigrutelApp.get(); const next=JSON.stringify(data);
+     if(next!==signature || requestId){ signature=next; revision++; send('save',{data,revision,requestId}); }
+     else if(revision<=acknowledged)send('clean');
+   } catch(error){send('error',{message:error.message,requestId});}
+ };
+ window.addEventListener('message',event=>{
+   if(event.source!==parent || event.origin!==location.origin || event.data?.channel!=='eigrutel-projets-v1') return;
+   const m=event.data;
+   if(m.type==='init'){
+     loaded=false; initId=m.initId;
+     try{window.EigrutelApp.set(m.data,m.name); signature=''; loaded=true;send('loaded');report();}
+     catch(error){send('error',{message:error.message});}
+   }else if(m.initId===initId && m.type==='flush')report(m.requestId);
+   else if(m.initId===initId && m.type==='ack')acknowledged=Math.max(acknowledged,m.revision);
+ });
+ const dirty=()=>{if(!loaded)return;send('dirty');clearTimeout(timer);timer=setTimeout(()=>report(),150);};
+ document.addEventListener('input',dirty); document.addEventListener('change',dirty);document.addEventListener('click',dirty);
+ setInterval(()=>report(),800);
+ window.addEventListener('beforeunload',event=>{if(loaded && (eigrutelPending>0 || revision>acknowledged || JSON.stringify(window.EigrutelApp.get())!==signature)){event.preventDefault();event.returnValue='';}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)report();});
+ const ready=()=>send('ready');
+ if(document.readyState!=='loading')ready();else document.addEventListener('DOMContentLoaded',ready,{once:true});
+}
+
+</script>
 </body>
 </html>
